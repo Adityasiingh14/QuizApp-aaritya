@@ -79,117 +79,183 @@ class _QuizScreenState extends State<QuizScreen> {
                     double padding = constraints.maxWidth > 800 ? 40 : 20;
                     double textSize = constraints.maxWidth > 800 ? 28 : 24;
 
-                    return Container(
-                      width: constraints.maxWidth,
-                      height: constraints.maxHeight,
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                          colors: [
-                            Color(0xFF6A53A1), // Purple gradient start
-                            Color(0xFF240046), // Dark purple gradient end
-                          ],
+                    return Column(
+                      children: [
+                        LinearProgressIndicator(
+                          value: (_currentQuestionIndex + 1) /
+                              snapshot.data!.length,
+                          backgroundColor: Colors.white.withOpacity(0.3),
+                          color: Color(0xFF6A53A1),
+                          minHeight: 8,
                         ),
-                      ),
-                      child: Padding(
-                        padding: EdgeInsets.symmetric(
-                            horizontal: padding, vertical: padding),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              'Question ${_currentQuestionIndex + 1}/${snapshot.data!.length}',
-                              style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 22,
-                                  fontWeight: FontWeight.bold),
-                            ),
-                            Flexible(
-                              child: Container(
-                                width: double.infinity,
-                                padding: EdgeInsets.all(padding),
-                                decoration: BoxDecoration(
-                                  color: _selectedOptionId != null
-                                      ? (_isCorrect!
-                                          ? Colors.green[700]
-                                          : Colors.red[700])
-                                      : Colors.white.withOpacity(0.1),
-                                  borderRadius: BorderRadius.circular(20),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Colors.black.withOpacity(0.3),
-                                      spreadRadius: 3,
-                                      blurRadius: 10,
-                                    ),
-                                  ],
-                                ),
-                                child: Text(
-                                  question.question,
-                                  style: TextStyle(
-                                      color: Colors.white,
-                                      fontSize: textSize,
-                                      fontWeight: FontWeight.w600),
-                                  textAlign: TextAlign.center,
-                                ),
+                        Expanded(
+                          child: Container(
+                            width: constraints.maxWidth,
+                            height: constraints.maxHeight,
+                            decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                                begin: Alignment.topLeft,
+                                end: Alignment.bottomRight,
+                                colors: [
+                                  Color(0xFF6A53A1), // Purple gradient start
+                                  Color(0xFF240046), // Dark purple gradient end
+                                ],
                               ),
                             ),
-                            SizedBox(height: 20),
-                            Column(
-                              children: question.options.map((option) {
-                                bool isSelected =
-                                    _selectedOptionId == option.id;
-                                bool isCorrectOption =
-                                    option.id == question.correctAnswer;
-
-                                return Container(
-                                  margin: EdgeInsets.symmetric(vertical: 8),
-                                  width: constraints.maxWidth * 0.8,
-                                  child: ElevatedButton(
-                                    style: ElevatedButton.styleFrom(
-                                      backgroundColor: isSelected
-                                          ? (isCorrectOption
-                                              ? Colors.green
-                                              : Colors.red)
-                                          : Color(0xFF6A53A1), // Purple color
-                                      foregroundColor: Colors.white,
-                                      padding:
-                                          EdgeInsets.symmetric(vertical: 16),
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(12),
+                            child: Padding(
+                              padding: EdgeInsets.symmetric(
+                                  horizontal: padding, vertical: padding),
+                              child: Column(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(
+                                    'Question ${_currentQuestionIndex + 1}/${snapshot.data!.length}',
+                                    style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 22,
+                                        fontWeight: FontWeight.bold),
+                                  ),
+                                  if (question.imageUrl.isNotEmpty)
+                                    Container(
+                                      constraints: BoxConstraints(
+                                        maxHeight: constraints.maxHeight *
+                                            0.3, // Limit the height of the image
                                       ),
-                                      shadowColor: isSelected
-                                          ? (isCorrectOption
-                                              ? Colors.greenAccent
-                                              : Colors.redAccent)
-                                          : Colors.black.withOpacity(0.5),
-                                      elevation: 8,
-                                      side: isSelected
-                                          ? BorderSide(
-                                              color: isCorrectOption
-                                                  ? Colors.greenAccent
-                                                  : Colors.redAccent,
-                                              width: 2,
-                                            )
-                                          : BorderSide.none,
+                                      padding: const EdgeInsets.symmetric(
+                                          vertical: 20),
+                                      child: Image.network(
+                                        question.imageUrl,
+                                        fit: BoxFit.contain,
+                                        loadingBuilder: (BuildContext context,
+                                            Widget child,
+                                            ImageChunkEvent? loadingProgress) {
+                                          if (loadingProgress == null) {
+                                            return child;
+                                          } else {
+                                            return Center(
+                                              child: CircularProgressIndicator(
+                                                value: loadingProgress
+                                                            .expectedTotalBytes !=
+                                                        null
+                                                    ? loadingProgress
+                                                            .cumulativeBytesLoaded /
+                                                        (loadingProgress
+                                                                .expectedTotalBytes ??
+                                                            1)
+                                                    : null,
+                                              ),
+                                            );
+                                          }
+                                        },
+                                        errorBuilder: (BuildContext context,
+                                            Object exception,
+                                            StackTrace? stackTrace) {
+                                          return Text(
+                                            'Image not available',
+                                            style: TextStyle(color: Colors.red),
+                                          ); // Handle broken URLs or loading errors
+                                        },
+                                      ),
+                                    )
+                                  else
+                                    Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                          vertical: 20),
+                                      child: Text(
+                                          'No image available'), // Or show a placeholder image
                                     ),
-                                    onPressed: _selectedOptionId == null
-                                        ? () => _answerQuestion(option.id)
-                                        : null,
-                                    child: Text(
-                                      option.text,
-                                      style: TextStyle(
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.w500,
+                                  Flexible(
+                                    child: Container(
+                                      width: double.infinity,
+                                      padding: EdgeInsets.all(padding),
+                                      decoration: BoxDecoration(
+                                        color: _selectedOptionId != null
+                                            ? (_isCorrect!
+                                                ? Colors.green[700]
+                                                : Colors.red[700])
+                                            : Colors.white.withOpacity(0.1),
+                                        borderRadius: BorderRadius.circular(20),
+                                        boxShadow: [
+                                          BoxShadow(
+                                            color:
+                                                Colors.black.withOpacity(0.3),
+                                            spreadRadius: 3,
+                                            blurRadius: 10,
+                                          ),
+                                        ],
+                                      ),
+                                      child: Text(
+                                        question.question,
+                                        style: TextStyle(
+                                            color: Colors.white,
+                                            fontSize: textSize,
+                                            fontWeight: FontWeight.w600),
+                                        textAlign: TextAlign.center,
                                       ),
                                     ),
                                   ),
-                                );
-                              }).toList(),
+                                  SizedBox(height: 20),
+                                  Column(
+                                    children: question.options.map((option) {
+                                      bool isSelected =
+                                          _selectedOptionId == option.id;
+                                      bool isCorrectOption =
+                                          option.id == question.correctAnswer;
+
+                                      return Container(
+                                        margin:
+                                            EdgeInsets.symmetric(vertical: 8),
+                                        width: constraints.maxWidth * 0.8,
+                                        child: ElevatedButton(
+                                          style: ElevatedButton.styleFrom(
+                                            backgroundColor: isSelected
+                                                ? (isCorrectOption
+                                                    ? Colors.green
+                                                    : Colors.red)
+                                                : Color(0xFF6A53A1),
+                                            foregroundColor: Colors.white,
+                                            padding: EdgeInsets.symmetric(
+                                                vertical: 16),
+                                            shape: RoundedRectangleBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(12),
+                                            ),
+                                            shadowColor: isSelected
+                                                ? (isCorrectOption
+                                                    ? Colors.greenAccent
+                                                    : Colors.redAccent)
+                                                : Colors.black.withOpacity(0.5),
+                                            elevation: 8,
+                                            side: isSelected
+                                                ? BorderSide(
+                                                    color: isCorrectOption
+                                                        ? Colors.greenAccent
+                                                        : Colors.redAccent,
+                                                    width: 2,
+                                                  )
+                                                : BorderSide.none,
+                                          ),
+                                          onPressed: _selectedOptionId == null
+                                              ? () => _answerQuestion(option.id)
+                                              : null,
+                                          child: Text(
+                                            option.text,
+                                            style: TextStyle(
+                                              fontSize: 18,
+                                              fontWeight: FontWeight.w500,
+                                            ),
+                                          ),
+                                        ),
+                                      );
+                                    }).toList(),
+                                  ),
+                                ],
+                              ),
                             ),
-                          ],
+                          ),
                         ),
-                      ),
+                      ],
                     );
                   }
                 },

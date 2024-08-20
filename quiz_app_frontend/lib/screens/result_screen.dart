@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart'; // Add this for pie chart
 import '../widgets/animated_background.dart';
+import '../screens/home_screen.dart'; // Import the HomeScreen
 
 class ResultScreen extends StatelessWidget {
   const ResultScreen({super.key});
@@ -34,11 +35,11 @@ class ResultScreen extends StatelessWidget {
                     Container(
                       padding: EdgeInsets.all(24),
                       decoration: BoxDecoration(
-                        color: Colors.deepPurple[700],
+                        color: Color(0xFF6A53A1),
                         borderRadius: BorderRadius.circular(20),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.deepPurple.withOpacity(0.4),
+                            color: Color(0xFF6A53A1).withOpacity(0.4),
                             blurRadius: 10,
                             spreadRadius: 2,
                           ),
@@ -53,7 +54,7 @@ class ResultScreen extends StatelessWidget {
                           Text(
                             '$correctAnswers out of 10',
                             style: TextStyle(
-                              color: Colors.orangeAccent,
+                              color: Color(0xFFFFC107),
                               fontSize: 28,
                               fontWeight: FontWeight.bold,
                             ),
@@ -78,11 +79,11 @@ class ResultScreen extends StatelessWidget {
                       style: ElevatedButton.styleFrom(
                         padding:
                             EdgeInsets.symmetric(horizontal: 80, vertical: 15),
-                        backgroundColor: Colors.orangeAccent,
+                        backgroundColor: Color(0xFFFFC107),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(30),
                         ),
-                        shadowColor: Colors.orangeAccent.withOpacity(0.5),
+                        shadowColor: Color(0xFFFFC107).withOpacity(0.5),
                         elevation: 10,
                       ),
                       onPressed: () {
@@ -96,15 +97,23 @@ class ResultScreen extends StatelessWidget {
                       style: ElevatedButton.styleFrom(
                         padding:
                             EdgeInsets.symmetric(horizontal: 80, vertical: 15),
-                        backgroundColor: Colors.purpleAccent,
+                        backgroundColor:
+                            Colors.white, // Set background to white
+                        foregroundColor:
+                            Color(0xFF6A53A1), // Set text color to purple
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(30),
                         ),
-                        shadowColor: Colors.purpleAccent.withOpacity(0.5),
+                        shadowColor: Colors.white.withOpacity(0.5),
                         elevation: 10,
                       ),
                       onPressed: () {
-                        Navigator.pushReplacementNamed(context, '/');
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => HomeScreen(),
+                          ),
+                        ); // Route to the HomeScreen
                       },
                     ),
                   ],
